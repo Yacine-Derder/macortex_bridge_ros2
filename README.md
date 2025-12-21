@@ -1,4 +1,4 @@
-# DISAL MoCap
+# macortex_bridge_ros2
 
 Standalone package allowing to extract pose information as ROS topic from the **Motion Analysis Cortex** (MACortex) system.
 
@@ -6,10 +6,8 @@ Tested with Cortex software version `10`.
 
 ## Overview 
 
-This repository contains the following ROS package: 
+This repository contains the following ROS2 package: 
 - `macortex_bridge`
-
-Additional legacy code is contained in the `LEGACY` directory and can be safely ignored. 
 
 ### Published topics
 The `macortex_bridge` node receives the data for the defined props in Cortex and automatically publishes one topic per prop: 
