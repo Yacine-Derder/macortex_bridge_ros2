@@ -1,0 +1,19 @@
+# Repository containing px_comm
+# px-ros-pkg/ -> originally ignored but no version control, so better track changes 
+
+# Build files 
+bin/
+build/
+install/
+log/
+*.a
+clienttest
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake 
+
+# editors
+.vscode/

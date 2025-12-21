@@ -1,0 +1,30 @@
+macortex_bridge:
+  ros__parameters:
+    # Cortex/MCS networking (optional but recommended on multi-NIC machines).
+    # - cortex.my_ip: IP of THIS computer on the MCS/Cortex network.
+    #   Leave empty to auto-detect (based on cortex.host_ip route if set, otherwise default route).
+    # - cortex.host_ip: IP/hostname of the MCS computer.
+    #   Leave empty to let the Cortex SDK auto-discover.
+    cortex.my_ip: ""
+    cortex.host_ip: ""
+
+    # Publishing rate (Hz)
+    rate: 30.0
+
+    # Frame in which to express the tracked poses
+    # Usually one of: world, map
+    # Expressed in FLU (Forward, Left, Up) coordinates
+    frame_id: jordils
+
+    # Name of the prop to track. Leave empty to track all defined props
+    # in the macortex software. If a name is specified, only this prop
+    # will be relayed to ROS.
+    prop_name: ""
+
+    # If true, speed messages are published alongside the pose topics.
+    # Only linear speeds are measured (finite difference of position).
+    enable_speed: false
+    speed_to_body: false
+
+    # Low-pass filter cutoff on measured speed (Hz). Disabled if <= 0.0
+    cutoff: 0.0
