@@ -16,7 +16,6 @@
 //     state with a mutex and publish from a timer.
 //
 // Topics (published):
-//   - macortex_bridge/poses                       (macortex_bridge/msg/PoseStampedArray)
 //   - macortex_bridge/<body_name>/pose            (geometry_msgs/msg/PoseStamped)
 //   - macortex_bridge/<body_name>/speed           (geometry_msgs/msg/Vector3Stamped) [optional]
 //   - tf                                          (tf2_ros/TransformBroadcaster)
@@ -47,11 +46,8 @@
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <geometry_msgs/msg/vector3_stamped.hpp>
-#include <std_msgs/msg/string.hpp>
 
 #include <tf2_ros/transform_broadcaster.h>
-
-#include <macortex_bridge/msg/pose_stamped_array.hpp>
 
 #include "cortex.h"
 
@@ -213,9 +209,6 @@ public:
 
     cortex_my_ip_ = get_parameter("cortex.my_ip").as_string();
     cortex_host_ip_ = get_parameter("cortex.host_ip").as_string();
-
-    mcs_poses_pub_ = create_publisher<macortex_bridge::msg::PoseStampedArray>(
-      "macortex_bridge/poses", rclcpp::QoS(rclcpp::KeepLast(1)));
 
     // Publishes transforms for each tracked body on /tf.
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
@@ -394,11 +387,6 @@ private:
         "Cortex frame received but contains 0 bodies.");
     }
 
-    quad_pose_array_msg_.header.stamp = current_time;
-    quad_pose_array_msg_.header.frame_id = frame_id_;
-    quad_pose_array_msg_.names.clear();
-    quad_pose_array_msg_.poses.clear();
-
     int valid_pose_count = 0;
     for (int i = 0; i < frame->nBodies; i++) {
       const auto& body_data = frame->BodyData[i];
@@ -503,11 +491,6 @@ private:
       }
 
       last_pose_msgs_[body_name] = mcs_pose_msg;
-
-      std_msgs::msg::String name_msg;
-      name_msg.data = body_name;
-      quad_pose_array_msg_.names.push_back(name_msg);
-      quad_pose_array_msg_.poses.push_back(mcs_pose_msg.pose);
     }
 
     if (frame->nBodies > 0 && valid_pose_count == 0) {
@@ -533,7 +516,6 @@ private:
       geometry_msgs::msg::PoseStamped>> pose_jobs;
     std::vector<std::pair<rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr,
       geometry_msgs::msg::Vector3Stamped>> speed_jobs;
-    std::optional<macortex_bridge::msg::PoseStampedArray> array_job;
     std::vector<geometry_msgs::msg::TransformStamped> tf_jobs;
 
     {
@@ -591,12 +573,6 @@ private:
           speed_jobs.emplace_back(pub_it->second, std::move(msg));
         }
       }
-
-      if (mcs_poses_pub_->get_subscription_count() > 0 && prop_name_.empty() && !quad_pose_array_msg_.names.empty()) {
-        auto msg = quad_pose_array_msg_;
-        msg.header.stamp = current_time;
-        array_job = std::move(msg);
-      }
     }
 
     for (auto& job : pose_jobs) {
@@ -609,10 +585,6 @@ private:
 
     if (!tf_jobs.empty()) {
       tf_broadcaster_->sendTransform(tf_jobs);
-    }
-
-    if (array_job.has_value()) {
-      mcs_poses_pub_->publish(*array_job);
     }
   }
 
@@ -631,14 +603,12 @@ private:
   // Publishers
   std::unordered_map<std::string, rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr> pose_pubs_;
   std::unordered_map<std::string, rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>::SharedPtr> speed_pubs_;
-  rclcpp::Publisher<macortex_bridge::msg::PoseStampedArray>::SharedPtr mcs_poses_pub_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
   // State shared between Cortex callback thread and publish timer
   std::mutex mutex_;
   std::unordered_map<std::string, geometry_msgs::msg::PoseStamped> last_pose_msgs_;
   std::unordered_map<std::string, geometry_msgs::msg::Vector3Stamped> last_speed_msgs_;
-  macortex_bridge::msg::PoseStampedArray quad_pose_array_msg_;
   rclcpp::TimerBase::SharedPtr publish_timer_;
 
   std::atomic<uint64_t> frames_received_{0};

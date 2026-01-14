@@ -9,7 +9,7 @@ macortex_bridge:
     cortex.host_ip: ""
 
     # Publishing rate (Hz)
-    rate: 30.0
+    rate: 60.0
 
     # Frame in which to express the tracked poses
     # Usually one of: world, map
