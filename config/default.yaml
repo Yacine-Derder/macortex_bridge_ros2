@@ -6,7 +6,7 @@ macortex_bridge:
     # - cortex.host_ip: IP/hostname of the MCS computer.
     #   Leave empty to let the Cortex SDK auto-discover.
     cortex.my_ip: ""
-    cortex.host_ip: ""
+    cortex.host_ip: "192.168.1.44"
 
     # Publishing rate (Hz)
     rate: 60.0
@@ -14,7 +14,7 @@ macortex_bridge:
     # Frame in which to express the tracked poses
     # Usually one of: world, map
     # Expressed in FLU (Forward, Left, Up) coordinates
-    frame_id: jordils
+    frame_id: robotics_lab
 
     # Name of the prop to track. Leave empty to track all defined props
     # in the macortex software. If a name is specified, only this prop
