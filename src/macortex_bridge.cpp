@@ -551,9 +551,8 @@ private:
           continue;
         }
 
-        auto msg = kv.second;
-        msg.header.stamp = current_time;
-        pose_jobs.emplace_back(pub_it->second, std::move(msg));
+        // Keep the Cortex callback receipt time, including for a cached pose.
+        pose_jobs.emplace_back(pub_it->second, kv.second);
       }
 
       if (enable_speed_) {

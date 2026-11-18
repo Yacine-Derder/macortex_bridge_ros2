@@ -12,6 +12,8 @@ This repository contains the following ROS2 package:
 ### Published topics
 The `macortex_bridge` node receives the data for the defined props in Cortex and automatically publishes one topic per prop: 
 - `macortex_bridge/<prop_name>/pose`, of standard type `geometry_msgs::PoseStamped`
+  The header stamp is the bridge ROS clock time when the Cortex frame arrived.
+  Republished cached poses retain this stamp so consumers can detect tracking loss.
 
 Optionally, linear speeds can be published as well by setting `enable_speed = true` in the config file: 
 - `macortex_bridge/<prop_name>/speed`, of standard type `geometry_msgs::Vector3Stamped`
